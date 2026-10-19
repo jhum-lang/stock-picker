@@ -27,11 +27,11 @@ select{font:inherit;background:var(--card);color:var(--ink);border:1px solid var
 <div class="row"><span id="cnt"></span><label>정렬 <select id="sort">
 <option value="vol">변동성 낮은 순</option><option value="ret1y">1년 수익률 높은 순</option><option value="mcap">시가총액 큰 순</option></select></label></div>
 <div id="list"></div>
-<p class="note">분류 기준(전일 종가 기반): 최근 1년 수익률 20% 이상이거나 연환산 변동성 40% 이상이면 성장형, 그 외는 안정형. 과거 가격으로 계산한 참고 지표이며 미래 수익을 보장하지 않습니다. 투자 권유가 아니며 판단과 책임은 본인에게 있습니다.</p>
+<p class="note">분류 기준(전일 종가 기반): 조회한 종목 중 연환산 변동성이 중간값 이하면 안정형, 초과하면 성장형입니다(종목끼리의 상대 비교). 안정형은 절대적으로 안전하다는 뜻이 아닙니다. 과거 가격으로 계산한 참고 지표이며 미래 수익을 보장하지 않습니다. 투자 권유가 아니며 판단과 책임은 본인에게 있습니다.</p>
 </main>
 <script>
 const $=id=>document.getElementById(id);let all=[],tab="s";
-const grow=s=>s.ret1y>=20||s.vol>=40;
+let med=0;const grow=s=>s.vol>med;
 const f=(n,d=1)=>Number(n).toLocaleString("ko-KR",{maximumFractionDigits:d});
 const pct=n=>(n>0?"+":"")+f(n)+"%";
 const esc=t=>String(t).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
@@ -46,6 +46,7 @@ function render(){
 }
 $("tS").onclick=()=>{tab="s";render()};$("tG").onclick=()=>{tab="g";render()};$("sort").onchange=render;
 fetch("data.json?"+Date.now()).then(r=>r.json()).then(d=>{all=d.stocks;
+ const v=all.map(s=>s.vol).sort((a,b)=>a-b);med=v[Math.floor((v.length-1)/2)];
  const b=all[0].date;$("upd").textContent="시세 기준일 "+b.slice(0,4)+"-"+b.slice(4,6)+"-"+b.slice(6)+" · 갱신 "+d.updated;render()})
  .catch(()=>{$("upd").textContent="아직 data.json이 없어요. GitHub Actions를 한 번 실행해 주세요."});
 </script></body></html>
