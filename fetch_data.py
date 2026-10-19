@@ -10,7 +10,8 @@ STOCKS = ["삼성전자", "KT&G", "SK텔레콤", "KB금융", "신한지주", "�
           "SK하이닉스", "NAVER", "카카오", "셀트리온", "알테오젠", "에코프로",
           "HLB", "두산에너빌리티", "한화에어로스페이스", "크래프톤"]
 ETFS = ["TIGER 미국S&P500", "ACE 미국S&P500", "TIGER 미국나스닥100",
-        "TIGER 미국다우존스30", "KODEX 200", "TIGER 200"]
+        "TIGER 미국다우존스30", "TIGER 미국S&P500동일가중", "TIGER 미국S&P500(H)",
+        "TIGER 미국나스닥넥스트100", "KODEX 200", "TIGER 200"]
 
 now = datetime.now(timezone(timedelta(hours=9)))
 END = now.strftime("%Y%m%d")
@@ -39,12 +40,13 @@ result = []
 for kind, names in (("stock", STOCKS), ("etf", ETFS)):
     for name in names:
         try:
-                       got = fetch(kind, name)
+            got = fetch(kind, name)
             print("조회결과:", kind, name, len(got), "건", [r.get("itmsNm") for r in got[:2]])
             rows = [r for r in got if r.get("itmsNm", "").strip() == name]
             rows.sort(key=lambda r: r["basDt"])
             if len(rows) < 20:
-                print("건너뜀(데이터 부족):", kind, name); continue
+                print("건너뜀(데이터 부족):", kind, name)
+                continue
             closes = [float(r["clpr"]) for r in rows]
             rets = [closes[i] / closes[i - 1] - 1 for i in range(1, len(closes))]
             last = rows[-1]
