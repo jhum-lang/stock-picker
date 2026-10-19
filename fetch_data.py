@@ -39,7 +39,9 @@ result = []
 for kind, names in (("stock", STOCKS), ("etf", ETFS)):
     for name in names:
         try:
-            rows = [r for r in fetch(kind, name) if r.get("itmsNm", "").strip() == name]
+                       got = fetch(kind, name)
+            print("조회결과:", kind, name, len(got), "건", [r.get("itmsNm") for r in got[:2]])
+            rows = [r for r in got if r.get("itmsNm", "").strip() == name]
             rows.sort(key=lambda r: r["basDt"])
             if len(rows) < 20:
                 print("건너뜀(데이터 부족):", kind, name); continue
