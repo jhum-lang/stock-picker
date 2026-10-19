@@ -3,8 +3,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>안정·성장 종목 스크리너</title>
 <style>
-:root{--bg:#f6f7f9;--card:#fff;--ink:#14181f;--sub:#5b6472;--line:#e3e6eb;--blue:#2457d6;--bluebg:#e8eefc;--red:#d92d3a;--redbg:#fdecee;color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-@media(prefers-color-scheme:dark){:root{--bg:#0f1218;--card:#181c25;--ink:#eef0f4;--sub:#9aa3b2;--line:#2a303c;--blue:#7ba0ff;--bluebg:#1b2744;--red:#ff6b76;--redbg:#3a1a1e;color-scheme:dark}}
+:root{--bg:#f6f7f9;--card:#fff;--ink:#14181f;--sub:#5b6472;--line:#e3e6eb;--blue:#2457d6;--bluebg:#e8eefc;--red:#d92d3a;--redbg:#fdecee;--grn:#1d7a4b;--grnbg:#e5f4ec;color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root{--bg:#0f1218;--card:#181c25;--ink:#eef0f4;--sub:#9aa3b2;--line:#2a303c;--blue:#7ba0ff;--bluebg:#1b2744;--red:#ff6b76;--redbg:#3a1a1e;--grn:#5fd09a;--grnbg:#16322499;color-scheme:dark}}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:"Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",sans-serif;line-height:1.55}
 main{max-width:720px;margin:0 auto;padding:20px 16px 48px}h1{font-size:1.5rem;margin:8px 0 4px}
 .sub{color:var(--sub);font-size:.88rem;margin:0 0 16px}
@@ -12,6 +12,7 @@ main{max-width:720px;margin:0 auto;padding:20px 16px 48px}h1{font-size:1.5rem;ma
 .tab{flex:1;padding:10px;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:10px;font:inherit;cursor:pointer}
 .tab[aria-pressed=true].s{background:var(--bluebg);border-color:var(--blue);color:var(--blue)}
 .tab[aria-pressed=true].g{background:var(--redbg);border-color:var(--red);color:var(--red)}
+.tab[aria-pressed=true].e{background:var(--grnbg);border-color:var(--grn);color:var(--grn)}
 .row{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;font-size:.85rem;color:var(--sub)}
 select{font:inherit;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:6px}
 .stock{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:10px}
@@ -23,30 +24,31 @@ select{font:inherit;background:var(--card);color:var(--ink);border:1px solid var
 </style></head><body><main>
 <h1>안정 · 성장 종목 스크리너</h1>
 <p class="sub" id="upd">데이터 불러오는 중…</p>
-<div class="tabs"><button class="tab s" id="tS" aria-pressed="true">안정형</button><button class="tab g" id="tG" aria-pressed="false">성장형</button></div>
+<div class="tabs"><button class="tab s" id="tS" aria-pressed="true">안정형</button><button class="tab g" id="tG" aria-pressed="false">성장형</button><button class="tab e" id="tE" aria-pressed="false">ETF</button></div>
 <div class="row"><span id="cnt"></span><label>정렬 <select id="sort">
 <option value="vol">변동성 낮은 순</option><option value="ret1y">1년 수익률 높은 순</option><option value="mcap">시가총액 큰 순</option></select></label></div>
 <div id="list"></div>
-<p class="note">분류 기준(전일 종가 기반): 조회한 종목 중 연환산 변동성이 중간값 이하면 안정형, 초과하면 성장형입니다(종목끼리의 상대 비교). 안정형은 절대적으로 안전하다는 뜻이 아닙니다. 과거 가격으로 계산한 참고 지표이며 미래 수익을 보장하지 않습니다. 투자 권유가 아니며 판단과 책임은 본인에게 있습니다.</p>
+<p class="note">개별 종목 분류 기준(전일 종가 기반): 조회한 개별 종목 중 연환산 변동성이 중간값 이하면 안정형, 초과하면 성장형입니다(상대 비교). ETF는 분류하지 않고 별도 탭에 모았습니다. 안정형이 절대적으로 안전하다는 뜻은 아닙니다. 과거 가격으로 계산한 참고 지표이며 미래 수익을 보장하지 않습니다. 투자 권유가 아니며 판단과 책임은 본인에게 있습니다.</p>
 </main>
 <script>
 const $=id=>document.getElementById(id);let all=[],tab="s";
-let med=0;const grow=s=>s.vol>med;
+let med=0;const grow=s=>s.vol>med;const isE=s=>s.kind==="etf";
 const f=(n,d=1)=>Number(n).toLocaleString("ko-KR",{maximumFractionDigits:d});
 const pct=n=>(n>0?"+":"")+f(n)+"%";
 const esc=t=>String(t).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 function render(){
- $("tS").setAttribute("aria-pressed",tab==="s");$("tG").setAttribute("aria-pressed",tab==="g");
+ [["tS","s"],["tG","g"],["tE","e"]].forEach(([id,t])=>$(id).setAttribute("aria-pressed",tab===t));
  const k=$("sort").value;
- const rows=all.filter(s=>grow(s)===(tab==="g")).sort((a,b)=>k==="vol"?a.vol-b.vol:b[k]-a[k]);
+ const base=tab==="e"?all.filter(isE):all.filter(s=>!isE(s)&&grow(s)===(tab==="g"));
+ const rows=base.sort((a,b)=>k==="vol"?a.vol-b.vol:b[k]-a[k]);
  $("cnt").textContent=rows.length+"개 종목";
  $("list").innerHTML=rows.map(s=>`<article class="stock"><div class="top"><span><span class="name">${esc(s.name)}</span><span class="tk">${esc(s.code)} ${esc(s.market)}</span></span>
  <span class="${s.chg>=0?"up":"dn"}">${pct(s.chg)}</span></div>
  <div class="m"><div><b>${f(s.close,0)}원</b><span>종가</span></div><div><b class="${s.ret1y>=0?"up":"dn"}">${pct(s.ret1y)}</b><span>1년 수익률</span></div><div><b>${f(s.vol)}%</b><span>연 변동성</span></div></div></article>`).join("")||'<p class="sub">해당하는 종목이 없어요.</p>';
 }
-$("tS").onclick=()=>{tab="s";render()};$("tG").onclick=()=>{tab="g";render()};$("sort").onchange=render;
+$("tS").onclick=()=>{tab="s";render()};$("tG").onclick=()=>{tab="g";render()};$("tE").onclick=()=>{tab="e";render()};$("sort").onchange=render;
 fetch("data.json?"+Date.now()).then(r=>r.json()).then(d=>{all=d.stocks;
- const v=all.map(s=>s.vol).sort((a,b)=>a-b);med=v[Math.floor((v.length-1)/2)];
+ const v=all.filter(s=>!isE(s)).map(s=>s.vol).sort((a,b)=>a-b);med=v[Math.floor((v.length-1)/2)]||0;
  const b=all[0].date;$("upd").textContent="시세 기준일 "+b.slice(0,4)+"-"+b.slice(4,6)+"-"+b.slice(6)+" · 갱신 "+d.updated;render()})
  .catch(()=>{$("upd").textContent="아직 data.json이 없어요. GitHub Actions를 한 번 실행해 주세요."});
 </script></body></html>
