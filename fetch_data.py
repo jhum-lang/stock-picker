@@ -3,7 +3,7 @@ import json, os, sys, time, statistics, urllib.request, urllib.error, urllib.par
 from datetime import datetime, timedelta, timezone
 
 KEY = urllib.parse.unquote(os.environ.get("DATA_GO_KR_KEY", "").strip()).strip()
-URL = "https://apis.data.go.kr/1160100/service/GetStockSecuritiesInfoService/getStockPriceInfo"
+URL = "https://apis.data.go.kr/1160100/GetStockSecuritiesInfoService_V2/getStockPriceInfo_V2"
 # 보고 싶은 종목 이름을 여기에 추가/삭제하세요 (종목명은 정확히 입력)
 STOCKS = ["삼성전자", "KT&G", "SK텔레콤", "KB금융", "신한지주", "한국전력",
           "SK하이닉스", "NAVER", "카카오", "셀트리온", "알테오젠", "에코프로",
