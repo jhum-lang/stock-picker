@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html lang="ko"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>안정·성장 종목 스크리너</title>
+<title>안정.성장.ETF 종목 스크리너</title>
 <style>
 :root{--bg:#f6f7f9;--card:#fff;--ink:#14181f;--sub:#5b6472;--line:#e3e6eb;--blue:#2457d6;--bluebg:#e8eefc;--red:#d92d3a;--redbg:#fdecee;--grn:#1d7a4b;--grnbg:#e5f4ec;color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 @media(prefers-color-scheme:dark){:root{--bg:#0f1218;--card:#181c25;--ink:#eef0f4;--sub:#9aa3b2;--line:#2a303c;--blue:#7ba0ff;--bluebg:#1b2744;--red:#ff6b76;--redbg:#3a1a1e;--grn:#5fd09a;--grnbg:#16322499;color-scheme:dark}}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:"Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",sans-serif;line-height:1.55}
-main{max-width:720px;margin:0 auto;padding:20px 16px 48px}h1{font-size:1.5rem;margin:8px 0 4px}
+*{box-sizing:border-box}body{font-size:17px;margin:0;background:var(--bg);color:var(--ink);font-family:"Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",sans-serif;line-height:1.55}
+main{max-width:720px;margin:0 auto;padding:20px 16px 48px}h1{font-size:2rem;margin:8px 0 4px}
 .sub{color:var(--sub);font-size:.88rem;margin:0 0 16px}
 .tabs{display:flex;gap:8px;margin-bottom:12px}
 .tab{flex:1;padding:10px;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:10px;font:inherit;cursor:pointer}
@@ -22,7 +22,7 @@ select{font:inherit;background:var(--card);color:var(--ink);border:1px solid var
 .up{color:var(--red)}.dn{color:var(--blue)}
 .note{font-size:.8rem;color:var(--sub);border-top:1px solid var(--line);padding-top:14px;margin-top:20px}
 </style></head><body><main>
-<h1>안정 · 성장 종목 스크리너</h1>
+<h1>안정.성장.ETF 종목 스크리너</h1>
 <p class="sub" id="upd">데이터 불러오는 중…</p>
 <div class="tabs"><button class="tab s" id="tS" aria-pressed="true">안정형</button><button class="tab g" id="tG" aria-pressed="false">성장형</button><button class="tab e" id="tE" aria-pressed="false">ETF</button></div>
 <div class="row"><span id="cnt"></span><label>정렬 <select id="sort">
